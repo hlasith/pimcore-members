@@ -2,6 +2,7 @@
 
 namespace MembersBundle\EventListener;
 
+use http\Env\Request;
 use MembersBundle\Event\StaticRouteEvent;
 use MembersBundle\Manager\RestrictionManager;
 use MembersBundle\Manager\RestrictionManagerInterface;
@@ -17,6 +18,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Routing\RouterInterface;
+
+use Symfony\Component\HttpFoundation\Cookie;
+use Symfony\Component\HttpFoundation\Response;
 
 class ForbiddenRouteListener implements EventSubscriberInterface
 {
@@ -101,6 +105,15 @@ class ForbiddenRouteListener implements EventSubscriberInterface
             $restrictionRoute = $this->getRouteForRestriction($restriction);
             if ($restrictionRoute !== false) {
                 $response = new RedirectResponse($this->router->generate($restrictionRoute));
+                $cookiePath = $_SERVER["REQUEST_URI"];
+
+                $cookie = new Cookie(
+                    'redirect_after_login',    // Cookie name.
+                    $cookiePath
+                );
+
+                $response->headers->setCookie($cookie);
+
                 $event->setResponse($response);
             }
         }

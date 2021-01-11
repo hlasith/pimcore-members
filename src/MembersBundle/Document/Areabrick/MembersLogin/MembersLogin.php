@@ -66,6 +66,12 @@ class MembersLogin extends AbstractTemplateAreabrick
             $formParams['_target_path'] = $params['target_path'];
         }
 
+        $cookies = $info->getRequest()->cookies;
+        if ($cookies->has('redirect_after_login'))
+        {
+            $formParams['_target_path'] = $cookies->get('redirect_after_login');
+        }
+
         if (isset($params['last_username'])) {
             $formParams['last_username'] = $params['last_username'];
         }
